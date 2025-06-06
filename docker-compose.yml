@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  frontEnd:
+    image: web
+    container_name: frontEnd
+    build:
+      context: ./frontEnd
+    ports:
+      - "4200:8081"
+    depends_on:
+      - api_veiculos
+  api_veiculos:
+    image: 'docker-spring-boot-postgres:latest'
+    container_name: api_veiculos
+    build:
+      context: ./api/apiTimNova
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres_db_veiculo
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db_veiculo:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  postgres_db_veiculo:
+    image: postgres:latest
+    container_name: PostgresContVeiculos
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_db_veiculo:/var/lib/postgresql/data
+volumes:
+  postgres_db_veiculo:
+    driver: local
